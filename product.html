@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireless Headphones - Besa</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--text:#1d1d1d;--muted:#6f6f6f;--line:#f1e2db;--orange:#f4511e;--orange2:#ff7a45;--soft:#fdeee8;--green:#16a34a;--amber:#f59e0b;--blue:#2563eb}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--text);background:#fdf6f2;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer}
+
+/* ===== Layout ===== */
+.sidebar{width:230px;background:#fff;border-right:1px solid var(--line);padding:20px 14px;position:fixed;inset:0 auto 0 0;display:flex;flex-direction:column;z-index:60;transition:transform .35s ease;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;font-size:26px;font-weight:800;letter-spacing:-.04em;padding:0 8px 20px}
+.brand-mark{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange2),var(--orange));display:grid;place-items:center;color:#fff;font-size:16px;font-weight:800}
+.nav a{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:10px;font-size:14px;font-weight:500;margin-bottom:6px;color:#444;transition:background .25s,color .25s,transform .25s}
+.nav a i{width:18px;text-align:center;font-size:16px}
+.nav a:hover{background:var(--soft);color:var(--orange);transform:translateX(3px)}
+.nav a.active{background:linear-gradient(135deg,var(--orange2),var(--orange));color:#fff;box-shadow:0 8px 18px rgba(244,81,30,.28)}
+.side-promo{margin-top:auto;background:var(--soft);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.sp-img{height:100px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.sp-img img{max-height:100px;object-fit:contain;animation:floaty 4s ease-in-out infinite}
+.side-promo h4{font-size:15px;font-weight:700;margin-bottom:6px}
+.side-promo p{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--orange);color:#fff;font-weight:600;font-size:12px;padding:9px 16px;border-radius:8px;transition:transform .2s,background .2s,box-shadow .2s}
+.btn:hover{background:#d93f10;transform:translateY(-2px);box-shadow:0 8px 16px rgba(244,81,30,.3)}
+
+.main{margin-left:230px;min-width:0;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:14px 24px;position:sticky;top:0;z-index:30}
+.hamburger{display:none;width:26px;height:18px;position:relative;background:none;border:0;flex-shrink:0}
+.hamburger span{position:absolute;left:0;width:100%;height:2px;background:var(--orange);border-radius:2px;transition:.3s}
+.hamburger span:nth-child(1){top:0}.hamburger span:nth-child(2){top:8px}.hamburger span:nth-child(3){top:16px}
+.hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.search{flex:1;max-width:600px;display:flex;align-items:center;gap:10px;background:#f7f1ee;border:1px solid var(--line);border-radius:10px;padding:0 14px}
+.search input{flex:1;border:0;background:transparent;outline:none;padding:11px 0;font-size:13.5px;font-family:inherit}
+.search:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(244,81,30,.1)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.bell{position:relative;background:none;border:0;font-size:19px;color:#333}
+.bell b{position:absolute;top:-6px;right:-8px;background:var(--orange);color:#fff;font-size:10px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;animation:pulse 2s infinite}
+.lang{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;font-size:13px;display:flex;align-items:center;gap:6px}
+.profile{display:flex;align-items:center;gap:10px}
+.avatar{width:40px;height:40px;border-radius:50%;overflow:hidden;background:#ecd9d1;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profile strong{font-size:14px;display:block}
+.profile small{font-size:11px;color:var(--muted)}
+
+.content{padding:20px 24px 50px}
+.crumbs{font-size:13px;color:#666;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.crumbs i{font-size:10px;color:#bbb}
+.crumbs .cur{color:var(--text);font-weight:600}
+.reveal{opacity:0;transform:translateY(22px);animation:fadeUp .6s ease forwards}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}.d5{animation-delay:.33s}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 16px rgba(244,81,30,.05);transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(244,81,30,.1)}
+
+/* ===== Top grid ===== */
+.top-grid{display:grid;grid-template-columns:340px 1fr 300px;gap:22px;align-items:start}
+
+/* Gallery */
+.gallery{display:flex;gap:14px}
+.thumbs{display:flex;flex-direction:column;gap:10px}
+.thumb{width:70px;height:70px;border-radius:10px;border:2px solid var(--line);overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;transition:border-color .2s,transform .2s}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb:hover{transform:translateY(-2px)}
+.thumb.active{border-color:var(--orange)}
+.thumb.more{display:grid;place-items:center;background:rgba(0,0,0,.5);color:#fff;font-size:12px;font-weight:700}
+.thumb.more::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.thumb.more span{position:relative;z-index:1}
+.main-shot{flex:1;position:relative;background:var(--soft);border-radius:14px;overflow:hidden;min-height:460px;display:flex;align-items:center;justify-content:center;padding:20px}
+.main-shot img{max-height:420px;object-fit:contain;transition:opacity .3s,transform .3s}
+.badge-off{position:absolute;top:16px;left:16px;background:var(--orange);color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;z-index:2}
+.shot-actions{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:2}
+.shot-actions button{width:38px;height:38px;border-radius:50%;background:#fff;border:0;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.08);color:#333;transition:transform .2s,color .2s}
+.shot-actions button:hover{transform:scale(1.08);color:var(--orange)}
+.shot-actions button.liked{color:var(--orange)}
+.expand{position:absolute;bottom:16px;left:16px;width:36px;height:36px;border-radius:8px;background:#fff;border:0;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.08);z-index:2;color:#333}
+
+/* Details */
+.details{padding-top:2px}
+.tag-best{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--orange);font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-bottom:12px}
+.p-title{font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin-bottom:10px}
+.p-rate{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:14px}
+.stars{color:var(--amber);font-size:14px}
+.p-rate .rv{color:var(--muted)}
+.p-desc{color:#555;font-size:14.5px;line-height:1.65;margin-bottom:20px;max-width:480px}
+.price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.price{font-size:30px;font-weight:800;color:var(--orange)}
+.old-price{font-size:16px;color:#aaa;text-decoration:line-through}
+.off-pill{background:#e6f7ec;color:var(--green);font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.tax-note{font-size:12px;color:var(--muted);margin-bottom:22px}
+.opt-label{font-size:13.5px;font-weight:600;margin-bottom:10px}
+.colors{display:flex;gap:10px;margin-bottom:22px}
+.color{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative;transition:transform .2s}
+.color:hover{transform:scale(1.1)}
+.color.active{border-color:var(--orange);box-shadow:0 0 0 2px #fff inset}
+.qty{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.qty button{width:38px;height:38px;border:1px solid var(--line);background:#fff;font-size:16px;color:#444;transition:background .2s,color .2s}
+.qty button:first-child{border-radius:8px 0 0 8px}
+.qty button:last-child{border-radius:0 8px 8px 0}
+.qty button:hover{background:var(--soft);color:var(--orange)}
+.qty input{width:46px;height:38px;border:1px solid var(--line);border-left:0;border-right:0;text-align:center;font-size:14px;font-weight:600;outline:none}
+.cta-row{display:flex;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.add-cart{flex:1;min-width:200px;background:var(--orange);color:#fff;border:0;font-weight:700;font-size:14.5px;padding:15px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s,transform .2s,box-shadow .2s}
+.add-cart:hover{background:#d93f10;transform:translateY(-2px);box-shadow:0 10px 20px rgba(244,81,30,.3)}
+.buy-now{flex:1;min-width:140px;background:#fff;border:1.5px solid var(--orange);color:var(--orange);font-weight:700;font-size:14.5px;padding:15px;border-radius:10px;transition:background .2s,color .2s}
+.buy-now:hover{background:var(--soft)}
+.perks{display:flex;gap:18px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line)}
+.perk{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.perk i{width:34px;height:34px;border-radius:8px;background:var(--soft);color:var(--orange);display:grid;place-items:center;font-size:15px}
+.perk b{display:block;font-weight:600;font-size:12.5px}
+.perk span{color:var(--muted);font-size:11.5px}
+
+/* Right column */
+.right-col{display:flex;flex-direction:column;gap:18px}
+.rc-pad{padding:20px}
+.store-row{display:flex;align-items:center;gap:12px;margin-top:12px}
+.store-logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--orange2),var(--orange));display:grid;place-items:center;color:#fff;font-size:18px;font-weight:800;flex-shrink:0}
+.store-name{font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:6px}
+.store-name i{color:var(--blue);font-size:13px}
+.store-rate{font-size:12px;color:var(--muted);margin-top:2px}
+.store-rate .stars{font-size:12px}
+.store-btns{display:flex;gap:10px;margin-top:14px}
+.store-btns button{flex:1;padding:9px;border-radius:8px;font-size:12.5px;font-weight:600;border:0;transition:transform .2s,background .2s}
+.store-btns .vs{background:var(--soft);color:var(--orange)}
+.store-btns .fw{background:#fff0e9;color:var(--orange);border:1px solid #ffd9c4}
+.store-btns button:hover{transform:translateY(-2px)}
+
+.sec-head{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14.5px;margin-bottom:14px}
+.sec-head i{color:var(--orange)}
+.pincode-row{display:flex;gap:8px;margin-bottom:12px}
+.pincode-row input{flex:1;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;outline:none;font-family:inherit}
+.pincode-row input:focus{border-color:var(--orange)}
+.pincode-row button{background:var(--orange);color:#fff;border:0;padding:0 16px;border-radius:8px;font-weight:600;font-size:13px;transition:background .2s}
+.pincode-row button:hover{background:#d93f10}
+.delivery-ok{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--green);margin-bottom:16px}
+.delivery-ok i{font-size:8px}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13px}
+.feat-list li{display:flex;align-items:center;gap:9px}
+.feat-list i{color:var(--green);font-size:12px}
+
+.offer-card{background:linear-gradient(120deg,#ffe3d3,#fff0e8);border-radius:14px;padding:18px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.offer-card .txt small{color:var(--orange);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+.offer-card .txt h4{font-size:16px;font-weight:800;margin:4px 0}
+.offer-card .txt p{font-size:11.5px;color:var(--muted)}
+.offer-arrow{width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;flex-shrink:0;transition:transform .3s}
+.offer-card:hover .offer-arrow{transform:translateX(4px)}
+.offer-img{width:70px;height:70px;flex-shrink:0}
+.offer-img img{width:100%;height:100%;object-fit:contain;animation:floaty 4s ease-in-out infinite}
+
+.rev-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.rev-head a{font-size:12.5px;color:var(--orange);font-weight:600}
+.rev-item{display:flex;gap:12px;margin-bottom:6px}
+.rev-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;background:#ecd9d1;flex-shrink:0}
+.rev-avatar img{width:100%;height:100%;object-fit:cover}
+.rev-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rev-name{font-weight:700;font-size:13.5px}
+.rev-date{font-size:11px;color:#999}
+.rev-stars{font-size:11.5px;color:var(--amber);margin-top:2px}
+.rev-stars span{color:var(--muted);font-weight:600;margin-left:4px}
+.rev-text{font-size:12.5px;color:#555;line-height:1.5;margin-top:6px}
+.rev-imgs{display:flex;gap:8px;margin-top:8px}
+.rev-imgs .ri{width:44px;height:44px;border-radius:8px;overflow:hidden;background:var(--soft)}
+.rev-imgs .ri img{width:100%;height:100%;object-fit:cover}
+.rev-helpful{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-top:10px}
+
+/* ===== Bottom tabs section ===== */
+.tabs-card{margin-top:22px;padding:0}
+.tabs-head{display:flex;gap:8px;border-bottom:1px solid var(--line);padding:6px 20px 0}
+.tab-btn{background:none;border:0;padding:14px 8px;font-size:14px;font-weight:600;color:var(--muted);position:relative;transition:color .2s}
+.tab-btn:hover{color:var(--orange)}
+.tab-btn.active{color:var(--orange)}
+.tab-btn.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--orange);border-radius:2px}
+.tab-panels{padding:24px}
+.tab-panel{display:none;animation:fadeIn .4s ease}
+.tab-panel.active{display:grid;grid-template-columns:1.4fr 1fr;gap:30px}
+.tab-panel.single{display:none}
+.tab-panel.single.active{display:block}
+.tab-panel h4{font-size:16px;font-weight:700;margin-bottom:12px}
+.tab-panel p{font-size:13.5px;color:#555;line-height:1.75}
+.spec-table{width:100%;border-collapse:collapse}
+.spec-table tr{border-bottom:1px solid var(--line)}
+.spec-table tr:last-child{border-bottom:0}
+.spec-table td{padding:11px 6px;font-size:13px}
+.spec-table td:first-child{color:var(--muted);width:45%}
+.spec-table td:last-child{font-weight:600}
+.spec-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#e6cfc4;margin-right:10px}
+
+.reviews-summary{display:flex;gap:30px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+.rs-score{text-align:center}
+.rs-score b{font-size:44px;font-weight:800;display:block;line-height:1}
+.rs-score .stars{font-size:15px;margin-top:6px}
+.rs-score span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.rs-bars{flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px}
+.rs-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.rs-row .lbl{width:38px;color:var(--muted)}
+.rs-row .bar{flex:1;height:7px;background:#f1e8e4;border-radius:6px;overflow:hidden}
+.rs-row .bar i{display:block;height:100%;background:var(--amber);border-radius:6px;width:0;transition:width 1.2s .3s cubic-bezier(.2,.7,.2,1)}
+.rs-row .n{width:26px;text-align:right;color:var(--muted)}
+.review-list{display:flex;flex-direction:column;gap:18px}
+.review-full{padding-bottom:18px;border-bottom:1px solid var(--line)}
+.review-full:last-child{border-bottom:0;padding-bottom:0}
+
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(244,81,30,.5)}70%{box-shadow:0 0 0 8px rgba(244,81,30,0)}100%{box-shadow:0 0 0 0 rgba(244,81,30,0)}}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:auto}
+
+/* ===== Responsive ===== */
+@media(max-width:1300px){.top-grid{grid-template-columns:300px 1fr;grid-template-areas:"g d" "r r"}
+  .gallery{grid-area:g}.details{grid-area:d}.right-col{grid-area:r;flex-direction:row;flex-wrap:wrap}
+  .right-col > div{flex:1 1 260px}
+}
+@media(max-width:992px){
+  .sidebar{transform:translateX(-100%);box-shadow:6px 0 24px rgba(0,0,0,.15)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+}
+@media(max-width:860px){
+  .top-grid{grid-template-columns:1fr;grid-template-areas:"g" "d" "r"}
+  .gallery{flex-direction:column-reverse}
+  .thumbs{flex-direction:row;overflow-x:auto}
+  .main-shot{min-height:320px}
+  .tab-panel.active{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .topbar{padding:12px 16px;gap:10px}.content{padding:14px 16px 40px}
+  .lang,.profile div{display:none}
+  .cta-row{flex-direction:column}
+  .reviews-summary{flex-direction:column;align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="brand-mark">b</span>Besa</div>
+  <nav class="nav">
+    <a href="admin.html"><i class="fa-solid fa-house"></i>Dashboard</a>
+    <a href="product.html" class="active"><i class="fa-solid fa-box"></i>Products</a>
+    <a href="oder.html"><i class="fa-solid fa-bag-shopping"></i>Orders</a>
+    <a href="#"><i class="fa-solid fa-user"></i>Customers</a>
+    <a href="#"><i class="fa-solid fa-border-all"></i>Categories</a>
+    <a href="#"><i class="fa-solid fa-star"></i>Reviews</a>
+    <a href="#"><i class="fa-solid fa-tag"></i>Promotions</a>
+    <a href="#"><i class="fa-solid fa-gear"></i>Settings</a>
+  </nav>
+  <div class="side-promo">
+    <div class="sp-img"><img src="../images/image-removebg-preview.png" alt="Shopping bag"></div>
+    <h4>Grow Your Business</h4>
+    <p>Add new products, manage orders and boost your sales.</p>
+    <button class="btn">Add Product ➜</button>
+  </div>
+</aside>
+<div class="overlay" id="overlay"></div>
+
+<div class="main">
+  <header class="topbar">
+    <button class="hamburger" id="menuBtn" aria-label="menu"><span></span><span></span><span></span></button>
+    <div class="search"><i class="fa-solid fa-magnifying-glass" style="color:#999"></i><input type="text" placeholder="Search for products, categories or anything..."></div>
+    <div class="top-right">
+      <button class="bell"><i class="fa-regular fa-bell"></i><b>3</b></button>
+      <div class="lang"><i class="fa-solid fa-globe" style="color:var(--orange)"></i> English <i class="fa-solid fa-chevron-down" style="font-size:10px"></i></div>
+      <div class="profile">
+        <div class="avatar"><img src="../images/38.png" alt="Amit Sharma"></div>
+        <div><strong>Amit Sharma</strong><small>Admin</small></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="crumbs"><a href="#">Home</a><i class="fa-solid fa-chevron-right"></i><a href="#">Products</a><i class="fa-solid fa-chevron-right"></i><span class="cur">Wireless Headphones</span></div>
+
+    <div class="top-grid">
+      <!-- Gallery -->
+      <div class="gallery reveal d1">
+        <div class="thumbs" id="thumbs">
+          <div class="thumb active" data-img="0"><img src="../images/40.png" alt="Thumb 1"></div>
+          <div class="thumb" data-img="1"><img src="../images/36-removebg-preview.png" alt="Thumb 2"></div>
+          <div class="thumb" data-img="2"><img src="../images/high17-removebg-preview.png" alt="Thumb 3"></div>
+          <div class="thumb more" data-img="3"><img src="../images/35-removebg-preview.png" alt="Thumb 4"><span>+3</span></div>
+        </div>
+        <div class="main-shot">
+          <span class="badge-off">-25%</span>
+          <div class="shot-actions">
+            <button id="likeBtn"><i class="fa-regular fa-heart"></i></button>
+            <button><i class="fa-solid fa-share-nodes"></i></button>
+          </div>
+          <img src="../images/40.png" alt="Wireless Headphones" id="mainImg">
+          <button class="expand"><i class="fa-solid fa-expand"></i></button>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="details reveal d2">
+        <span class="tag-best"><i class="fa-solid fa-crown"></i> Best Seller</span>
+        <h1 class="p-title">Wireless Headphones Noise Cancelling</h1>
+        <div class="p-rate"><span class="stars">★★★★★</span><b>4.8</b><span class="rv">(120 reviews)</span></div>
+        <p class="p-desc">Experience premium sound quality with advanced noise cancellation. Perfect for music, calls and work from anywhere.</p>
+
+        <div class="price-row"><span class="price">₹2,499</span><span class="old-price">₹3,299</span><span class="off-pill">25% OFF</span></div>
+        <p class="tax-note">Inclusive of all taxes</p>
+
+        <p class="opt-label">Color</p>
+        <div class="colors">
+          <span class="color active" style="background:#e8c9a9" data-color="Beige"></span>
+          <span class="color" style="background:#3a3a3a" data-color="Black"></span>
+          <span class="color" style="background:#6b8bc4" data-color="Blue"></span>
+          <span class="color" style="background:#f0a1c2" data-color="Pink"></span>
+        </div>
+
+        <p class="opt-label">Quantity</p>
+        <div class="qty">
+          <button id="qMinus">−</button>
+          <input type="text" id="qVal" value="1" readonly>
+          <button id="qPlus">+</button>
+        </div>
+
+        <div class="cta-row">
+          <button class="add-cart"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+          <button class="buy-now">Buy Now</button>
+        </div>
+
+        <div class="perks">
+          <div class="perk"><i class="fa-solid fa-truck-fast"></i><div><b>Free Shipping</b><span>On orders above ₹999</span></div></div>
+          <div class="perk"><i class="fa-solid fa-rotate-left"></i><div><b>7 Days Return</b><span>Easy return policy</span></div></div>
+          <div class="perk"><i class="fa-solid fa-shield-halved"></i><div><b>Secure Payment</b><span>100% secure</span></div></div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="right-col reveal d3">
+        <div class="card rc-pad">
+          <div class="sec-head"><i class="fa-solid fa-store"></i>Store</div>
+          <div class="store-row">
+            <div class="store-logo">b</div>
+            <div>
+              <div class="store-name">Besa Store <i class="fa-solid fa-circle-check"></i></div>
+              <div class="store-rate"><span class="stars">★</span> 4.6 (2.8k followers)</div>
+            </div>
+          </div>
+          <div class="store-btns">
+            <button class="vs">View Store <i class="fa-solid fa-arrow-right"></i></button>
+            <button class="fw"><i class="fa-solid fa-star"></i> Follow</button>
+          </div>
+        </div>
+
+        <div class="card rc-pad">
+          <div class="sec-head"><i class="fa-solid fa-truck"></i>Delivery Details</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Enter your pincode</p>
+          <div class="pincode-row"><input type="text" placeholder="e.g. 400001" id="pincode"><button id="checkPin">Check</button></div>
+          <div class="delivery-ok" id="deliveryMsg" style="display:none"><i class="fa-solid fa-circle"></i>Delivery in 3 - 5 days</div>
+
+          <div class="sec-head" style="margin-top:18px"><i class="fa-solid fa-list-check"></i>Key Features</div>
+          <ul class="feat-list">
+            <li><i class="fa-solid fa-check"></i>Active Noise Cancellation (ANC)</li>
+            <li><i class="fa-solid fa-check"></i>Up to 30 Hours Battery Life</li>
+            <li><i class="fa-solid fa-check"></i>Quick Charge (10 mins = 3 hrs)</li>
+            <li><i class="fa-solid fa-check"></i>Bluetooth 5.3</li>
+            <li><i class="fa-solid fa-check"></i>Foldable Design</li>
+          </ul>
+        </div>
+
+        <div class="offer-card">
+          <div class="txt"><small>Special Offer!</small><h4>Get 25% OFF</h4><p>Limited time only</p></div>
+          <div class="offer-img"><img src="../images/40.png" alt="Offer"></div>
+          <div class="offer-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+
+        <div class="card rc-pad">
+          <div class="rev-head"><h4 style="font-size:14.5px;font-weight:700">Customer Reviews</h4><a href="#">View All <i class="fa-solid fa-arrow-right"></i></a></div>
+          <div class="rev-item">
+            <div class="rev-avatar"><!-- apni image yahan lagao --><img src="../images/38.png" alt="Rahul Verma"></div>
+            <div>
+              <div class="rev-top"><span class="rev-name">Rahul Verma</span><span class="rev-date">Apr 20, 2025</span></div>
+              <div class="rev-stars">★★★★★ <span>5.0</span></div>
+              <p class="rev-text">Amazing sound quality and the noise cancellation works really well. Highly recommended!</p>
+              <div class="rev-imgs">                  <div class="ri"><img src="../images/40.png" alt="Review photo 1"></div>
+                <div class="ri"><img src="../images/high17.png" alt="Review photo 2"></div>
+                <div class="ri"><img src="../images/37-removebg-preview.png" alt="Review photo 3"></div>
+              </div>
+              <div class="rev-helpful"><i class="fa-regular fa-thumbs-up"></i>Helpful (12)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <section class="card tabs-card reveal d4">
+      <div class="tabs-head">
+        <button class="tab-btn active" data-tab="desc">Description</button>
+        <button class="tab-btn" data-tab="specs">Specifications</button>
+        <button class="tab-btn" data-tab="reviews">Reviews (120)</button>
+      </div>
+
+      <div class="tab-panels">
+        <div class="tab-panel single active" id="panel-desc">
+          <h4>Product Description</h4>
+          <p>Our wireless headphones are designed for music lovers, professionals and everyday users who value great sound and comfort. With advanced noise cancellation, you can block out distractions and focus on what matters most. The lightweight and foldable design makes it easy to carry anywhere.</p>
+        </div>
+
+        <div class="tab-panel single" id="panel-specs">
+          <h4>Specifications</h4>
+          <table class="spec-table">
+            <tr><td><span class="spec-dot"></span>Battery Life</td><td>Up to 30 hours</td></tr>
+            <tr><td><span class="spec-dot"></span>Charging Time</td><td>1.5 hours</td></tr>
+            <tr><td><span class="spec-dot"></span>Bluetooth Version</td><td>5.3</td></tr>
+            <tr><td><span class="spec-dot"></span>Weight</td><td>250g</td></tr>
+            <tr><td><span class="spec-dot"></span>Warranty</td><td>1 Year</td></tr>
+          </table>
+        </div>
+
+        <div class="tab-panel single" id="panel-reviews">
+          <div class="reviews-summary">
+            <div class="rs-score"><b>4.8</b><div class="stars">★★★★★</div><span>120 reviews</span></div>
+            <div class="rs-bars">
+              <div class="rs-row"><span class="lbl">5 star</span><div class="bar"><i data-w="78"></i></div><span class="n">94</span></div>
+              <div class="rs-row"><span class="lbl">4 star</span><div class="bar"><i data-w="14"></i></div><span class="n">17</span></div>
+              <div class="rs-row"><span class="lbl">3 star</span><div class="bar"><i data-w="5"></i></div><span class="n">6</span></div>
+              <div class="rs-row"><span class="lbl">2 star</span><div class="bar"><i data-w="2"></i></div><span class="n">2</span></div>
+              <div class="rs-row"><span class="lbl">1 star</span><div class="bar"><i data-w="1"></i></div><span class="n">1</span></div>
+            </div>
+          </div>
+
+          <div class="review-list">
+            <div class="review-full">
+              <div class="rev-item" style="margin-bottom:0">
+                <div class="rev-avatar"><img src="../images/38.png" alt="Rahul Verma"></div>
+                <div style="flex:1">
+                  <div class="rev-top"><span class="rev-name">Rahul Verma</span><span class="rev-date">Apr 20, 2025</span></div>
+                  <div class="rev-stars">★★★★★ <span>5.0</span></div>
+                  <p class="rev-text">Amazing sound quality and the noise cancellation works really well. Highly recommended!</p>
+                  <div class="rev-helpful"><i class="fa-regular fa-thumbs-up"></i>Helpful (12)</div>
+                </div>
+              </div>
+            </div>
+            <div class="review-full">
+              <div class="rev-item" style="margin-bottom:0">
+                <div class="rev-avatar"><img src="../images/38.png" alt="Priya Singh"></div>
+                <div style="flex:1">
+                  <div class="rev-top"><span class="rev-name">Priya Singh</span><span class="rev-date">Apr 18, 2025</span></div>
+                  <div class="rev-stars">★★★★☆ <span>4.0</span></div>
+                  <p class="rev-text">Great battery life and comfortable fit. Sound is crisp, would buy again.</p>
+                  <div class="rev-helpful"><i class="fa-regular fa-thumbs-up"></i>Helpful (5)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Sidebar drawer
+  const sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay'),menuBtn=document.getElementById('menuBtn');
+  function toggleMenu(o){sidebar.classList.toggle('open',o);overlay.classList.toggle('show',o);menuBtn.classList.toggle('open',o);}
+  menuBtn.addEventListener('click',()=>toggleMenu(!sidebar.classList.contains('open')));
+  overlay.addEventListener('click',()=>toggleMenu(false));
+  addEventListener('resize',()=>{if(innerWidth>992)toggleMenu(false);});
+
+  // Gallery: click thumbnail -> update main image (product "details" open on click)
+  const thumbs=document.querySelectorAll('.thumb'),mainImg=document.getElementById('mainImg');
+  thumbs.forEach(t=>t.addEventListener('click',()=>{
+    thumbs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const src=t.querySelector('img').getAttribute('src');
+    mainImg.style.opacity=0;
+    setTimeout(()=>{ mainImg.setAttribute('src', src); mainImg.style.opacity=1; },150);
+  }));
+
+  // Like button
+  document.getElementById('likeBtn').addEventListener('click',function(){
+    this.classList.toggle('liked');
+    const i=this.querySelector('i');
+    i.classList.toggle('fa-regular'); i.classList.toggle('fa-solid');
+  });
+
+  // Color select
+  document.querySelectorAll('.color').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('.color').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+  }));
+
+  // Quantity
+  const qVal=document.getElementById('qVal');
+  document.getElementById('qMinus').addEventListener('click',()=>{ let v=+qVal.value; if(v>1) qVal.value=v-1; });
+  document.getElementById('qPlus').addEventListener('click',()=>{ qVal.value=+qVal.value+1; });
+
+  // Pincode check
+  document.getElementById('checkPin').addEventListener('click',()=>{
+    const v=document.getElementById('pincode').value.trim();
+    const msg=document.getElementById('deliveryMsg');
+    if(v.length>=4){ msg.style.display='flex'; }
+  });
+
+  // Tabs
+  const tabBtns=document.querySelectorAll('.tab-btn'),panels=document.querySelectorAll('.tab-panel.single');
+  tabBtns.forEach(b=>b.addEventListener('click',()=>{
+    tabBtns.forEach(x=>x.classList.remove('active'));
+    panels.forEach(p=>p.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('panel-'+b.dataset.tab).classList.add('active');
+    if(b.dataset.tab==='reviews'){
+      document.querySelectorAll('.rs-row .bar i').forEach(i=>{ i.style.width=i.dataset.w+'%'; });
+    }
+  }));
+</script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seller Dashboard - Besa</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--text:#1d1d1d;--muted:#6f6f6f;--line:#f1e2db;--orange:#f4511e;--orange2:#ff7a45;--soft:#fdeee8;--green:#16a34a;--red:#ef4444;--amber:#f59e0b;--blue:#2563eb}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--text);background:#fdf6f2;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer}
+.container{width:min(1280px,calc(100% - 40px));margin:0 auto}
+
+/* ===== Top nav ===== */
+.nav-bar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.nav-inner{display:flex;align-items:center;gap:22px;min-height:72px}
+.brand{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:800;letter-spacing:-.04em}
+.brand-mark{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--orange2),var(--orange));display:grid;place-items:center;color:#fff;font-size:18px;font-weight:800;letter-spacing:0}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:36px;font-size:14px;color:var(--muted)}
+.nav-links a{position:relative;transition:color .2s}
+.nav-links a:hover{color:var(--orange)}
+.nav-links a.active{color:var(--orange);font-weight:600}
+.nav-links a.active::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:2px;background:var(--orange);border-radius:2px}
+.add-btn{background:linear-gradient(135deg,var(--orange2),var(--orange));color:#fff;border:0;font-weight:600;font-size:14px;padding:11px 18px;border-radius:8px;box-shadow:0 8px 18px rgba(244,81,30,.28);transition:transform .2s,box-shadow .2s}
+.add-btn:hover{transform:translateY(-2px);box-shadow:0 12px 22px rgba(244,81,30,.36)}
+.bell{position:relative;background:none;border:0;font-size:20px}
+.bell b{position:absolute;top:-4px;right:-6px;background:var(--orange);color:#fff;font-size:9px;width:15px;height:15px;border-radius:50%;display:grid;place-items:center;animation:pulse 2s infinite}
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #ecd9d1;
+    border: 2px solid var(--line);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+.hamburger{display:none;width:26px;height:18px;position:relative;background:none;border:0;margin-left:auto}
+.hamburger span{position:absolute;left:0;width:100%;height:2px;background:var(--orange);border-radius:2px;transition:.3s}
+.hamburger span:nth-child(1){top:0}.hamburger span:nth-child(2){top:8px}.hamburger span:nth-child(3){top:16px}
+.hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+
+.drawer{position:fixed;top:0;left:-290px;width:270px;height:100%;background:#fff;z-index:60;padding:22px 20px;box-shadow:4px 0 24px rgba(0,0,0,.15);transition:left .35s ease;overflow-y:auto}
+.drawer.open{left:0}
+.drawer .brand{margin-bottom:20px}
+.drawer a{display:block;padding:13px 0;border-bottom:1px solid var(--line);font-weight:600;font-size:14px}
+.drawer a.active{color:var(--orange)}
+.drawer .add-btn{width:100%;margin-top:18px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:auto}
+
+/* ===== Content ===== */
+.main{padding:26px 0 40px}
+.crumbs{font-size:13px;color:#555;margin-bottom:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:22px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(244,81,30,.04);transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(244,81,30,.1)}
+.reveal{opacity:0;transform:translateY(22px);animation:fadeUp .6s ease forwards}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}.d5{animation-delay:.33s}
+.head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.head h3{font-size:16px;font-weight:600}
+.kebab{background:none;border:0;font-size:18px;color:#888;line-height:1;padding:4px 6px;border-radius:6px;transition:background .2s}
+.kebab:hover{background:var(--soft);color:var(--orange)}
+
+/* stat cards */
+.stat-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.s-ic{width:46px;height:46px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;font-size:20px;background:#fff;transition:transform .3s}
+.stat:hover .s-ic{transform:scale(1.08) rotate(-6deg)}
+.stat-top h3{font-size:16px;font-weight:600;flex:1}
+.stat-body{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.val{font-size:38px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.trend{font-size:13px;margin-top:10px;color:#444}
+.trend b{margin-right:6px;font-weight:600}.up{color:var(--green)}.down{color:var(--red)}
+.spark{width:130px;height:70px;flex-shrink:0}
+.spark .ln{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s .5s ease forwards}
+.spark .ar{opacity:0;animation:fadeIn 1s 1.3s forwards}
+.spark circle{opacity:0;animation:fadeIn .4s 1.2s forwards}
+
+/* order summary */
+.os{margin-top:22px}
+.os small{font-size:14px;color:#444;display:block;margin-bottom:6px}
+.os-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.os-row b{font-size:26px;font-weight:600}
+.os-row span{font-size:13px;color:var(--muted)}
+.bar{height:8px;border-radius:8px;background:#f1e8e4;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:8px;transition:width 1.4s .4s cubic-bezier(.2,.7,.2,1)}
+.os + .os{margin-top:34px}
+
+/* payment chart */
+.toggle{display:flex;border:1px solid var(--line);border-radius:20px;padding:3px;background:#fff}
+.toggle button{border:0;background:none;font-size:13px;color:var(--muted);padding:5px 14px;border-radius:16px;transition:background .25s,color .25s}
+.toggle button.on{background:var(--soft);color:var(--orange);font-weight:600}
+.chart{display:flex;gap:10px;margin-top:22px}
+.y-title{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;color:var(--muted);text-align:center}
+.plot{flex:1;position:relative;height:230px}
+.gl{position:absolute;left:38px;right:0;height:1px;background:#f3e6e0}
+.gl span{position:absolute;left:-40px;top:-7px;font-size:11px;color:#777;width:36px;text-align:right}
+.bars{position:absolute;left:38px;right:0;top:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-around;gap:14px;padding:0 10px}
+.b{flex:1;max-width:76px;height:0;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--orange2),var(--orange));transition:height 1s cubic-bezier(.2,.7,.2,1),filter .2s;position:relative;cursor:pointer}
+.b:hover{filter:brightness(1.1)}
+.b::after{content:attr(data-v);position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;color:var(--orange);opacity:0;transition:opacity .2s;white-space:nowrap}
+.b:hover::after{opacity:1}
+.xl{display:flex;justify-content:space-around;gap:14px;margin:8px 10px 0 48px;font-size:11px;color:#777}
+.xl span{flex:1;max-width:76px;text-align:center}
+
+/* review orders */
+.ro{display:grid;grid-template-columns:78px 1fr 92px;gap:12px;align-items:start;padding:16px 0;border-top:1px solid var(--line);transition:transform .25s}
+.ro:first-of-type{border-top:0}
+.ro:hover{transform:translateX(4px)}
+.ro small{display:block;font-size:11.5px;color:#888;margin-top:6px}
+.ro .d{font-size:13px;font-weight:500}
+.ro .p{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ro .c{font-size:13px;font-weight:500}
+.tag{display:inline-block;margin-top:5px;padding:3px 9px;border-radius:5px;font-size:11.5px;font-weight:500;border:1px solid}
+.t-tr{background:#eaf2ff;color:var(--blue);border-color:#cfe0ff}
+.t-pe{background:#fff6dc;color:#b45309;border-color:#fde7a3}
+.t-de{background:#e6f7ec;color:var(--green);border-color:#c5ecd2}
+
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(244,81,30,.5)}70%{box-shadow:0 0 0 8px rgba(244,81,30,0)}100%{box-shadow:0 0 0 0 rgba(244,81,30,0)}}
+
+@media(max-width:1100px){.grid3{grid-template-columns:repeat(2,1fr)}.grid3 .wide{grid-column:1/-1}}
+@media(max-width:860px){
+  .nav-links,.nav-inner .add-btn,.nav-inner .bell,.nav-inner .avatar{display:none}
+  .hamburger{display:block}
+  .brand{margin-right:auto}
+}
+@media(max-width:700px){.grid3{grid-template-columns:1fr}.val{font-size:32px}.spark{width:100px}.card{padding:20px}}
+@media(max-width:420px){.ro{grid-template-columns:1fr}.ro .p{white-space:normal}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="nav-bar">
+  <div class="container nav-inner">
+    <div class="brand"><span class="brand-mark">b</span>Besa</div>
+    <nav class="nav-links">
+      <a href="#" class="active">Dashboard</a>
+      <a href="#">Orders</a>
+      <a href="#">Promotion</a>
+      <a href="#">Inbox</a>
+    </nav>
+    <button class="add-btn">Add New Product</button>
+    <button class="bell"><i class="fa-regular fa-bell" style="color:var(--orange)"></i><b>3</b></button>
+    <div class="avatar"><img src="../images/38.png" alt="Seller"></div>
+    <button class="hamburger" id="menuBtn" aria-label="menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="brand"><span class="brand-mark">b</span>Besa</div>
+  <a href="#" class="active">Dashboard</a>
+  <a href="#">Orders</a>
+  <a href="#">Promotion</a>
+  <a href="#">Inbox</a>
+  <button class="add-btn">Add New Product</button>
+</aside>
+
+<main class="container main">
+  <div class="crumbs">Home / Seller Portal</div>
+
+  <!-- Stats -->
+  <section class="grid3">
+    <div class="card stat reveal d1">
+      <div class="stat-top"><span class="s-ic"><i class="fa-solid fa-cart-shopping" style="color:var(--orange)"></i></span><h3>Total Orders</h3><button class="kebab">⋮</button></div>
+      <div class="stat-body">
+        <div><div class="val" data-count="400">0</div><div class="trend"><b class="up">↗ 10%</b>vs last month</div></div>
+        <svg class="spark" viewBox="0 0 130 70">
+          <defs><linearGradient id="gu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16a34a" stop-opacity=".25"/><stop offset="1" stop-color="#16a34a" stop-opacity="0"/></linearGradient></defs>
+          <path class="ar" d="M2 66 L38 28 L88 38 L128 4 L128 68 L2 68Z" fill="url(#gu)"/>
+          <path class="ln" pathLength="1" d="M2 66 L38 28 L88 38 L128 4" fill="none" stroke="#16a34a" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="38" cy="28" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/><circle cx="88" cy="38" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card stat reveal d2">
+      <div class="stat-top"><span class="s-ic"><i class="fa-solid fa-sack-dollar" style="color:var(--orange)"></i></span><h3>Total Sell</h3><button class="kebab">⋮</button></div>
+      <div class="stat-body">
+        <div><div class="val" data-count="42.5" data-dec="1" data-prefix="$" data-suffix="K">$0</div><div class="trend"><b class="down">↘ 5%</b>vs last month</div></div>
+        <svg class="spark" viewBox="0 0 130 70">
+          <defs><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ef4444" stop-opacity=".25"/><stop offset="1" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs>
+          <path class="ar" d="M2 4 L38 50 L88 40 L128 66 L128 68 L2 68Z" fill="url(#gd)"/>
+          <path class="ln" pathLength="1" d="M2 4 L38 50 L88 40 L128 66" fill="none" stroke="#ef4444" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="38" cy="50" r="6" fill="#fff" stroke="#ef4444" stroke-width="2"/><circle cx="88" cy="40" r="6" fill="#fff" stroke="#ef4444" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card stat reveal d3 wide">
+      <div class="stat-top"><span class="s-ic"><i class="fa-solid fa-tags" style="color:var(--orange)"></i></span><h3>Total Products</h3><button class="kebab">⋮</button></div>
+      <div class="stat-body">
+        <div><div class="val" data-count="452">0</div><div class="trend"><b class="up">↑ +23</b>vs last month</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary row -->
+  <section class="grid3">
+    <div class="card reveal d2">
+      <div class="head"><h3>Order Summary</h3></div>
+      <div class="os">
+        <small>Pending Orders</small>
+        <div class="os-row"><b>40%</b><span>160/400 Orders</span></div>
+        <div class="bar"><i data-w="40" style="background:var(--amber)"></i></div>
+      </div>
+      <div class="os">
+        <small>Shipped Orders</small>
+        <div class="os-row"><b>30%</b><span>120/400 Orders</span></div>
+        <div class="bar"><i data-w="30" style="background:linear-gradient(90deg,var(--orange2),var(--orange))"></i></div>
+      </div>
+    </div>
+
+    <div class="card reveal d3">
+      <div class="head"><h3>Payment Summary</h3>
+        <div class="toggle" id="toggle"><button class="on" data-set="up">Upcoming</button><button data-set="paid">Paid</button></div>
+      </div>
+      <div class="chart">
+        <div class="y-title">Total amount due</div>
+        <div style="flex:1;min-width:0">
+          <div class="plot" id="plot">
+            <div class="gl" style="top:0"><span>$6,000</span></div>
+            <div class="gl" style="top:16.66%"><span>$5,000</span></div>
+            <div class="gl" style="top:33.33%"><span>$4,000</span></div>
+            <div class="gl" style="top:50%"><span>$3,000</span></div>
+            <div class="gl" style="top:66.66%"><span>$2,000</span></div>
+            <div class="gl" style="top:83.33%"><span>$1,000</span></div>
+            <div class="gl" style="top:100%"><span>$0</span></div>
+            <div class="bars"><div class="b"></div><div class="b"></div><div class="b"></div></div>
+          </div>
+          <div class="xl"><span>Week 1</span><span>Week 2</span><span>Week 3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card reveal d4 wide">
+      <div class="head" style="margin-bottom:14px"><h3>Review Orders</h3><button class="kebab">⋮</button></div>
+      <div class="ro"><div><div class="d">01/04/2024</div><small>#BSA12345</small></div><div><div class="p">Sport Shoes Classic</div><small>Amit Sharma</small></div><div><div class="c">New York, USA</div><span class="tag t-tr">In Transit</span></div></div>
+      <div class="ro"><div><div class="d">02/04/2024</div><small>#BSA12344</small></div><div><div class="p">Wireless Headphones</div><small>Priya Singh</small></div><div><div class="c">London, UK</div><span class="tag t-pe">Pending</span></div></div>
+      <div class="ro"><div><div class="d">24/05/2024</div><small>#BSA12343</small></div><div><div class="p">Smart Watch Series 5</div><small>Rahul Verma</small></div><div><div class="c">Karachi, PK</div><span class="tag t-de">Delivered</span></div></div>
+      <div class="ro"><div><div class="d">11/04/2024</div><small>#BSA12342</small></div><div><div class="p">Travel Backpack 30L</div><small>Neha Gupta</small></div><div><div class="c">Sydney, AUS</div><span class="tag t-de">Delivered</span></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Drawer
+  const drawer = document.getElementById('drawer'), overlay = document.getElementById('overlay'), menuBtn = document.getElementById('menuBtn');
+  function toggleMenu(open){ drawer.classList.toggle('open', open); overlay.classList.toggle('show', open); menuBtn.classList.toggle('open', open); }
+  menuBtn.addEventListener('click', () => toggleMenu(!drawer.classList.contains('open')));
+  overlay.addEventListener('click', () => toggleMenu(false));
+  addEventListener('resize', () => { if (innerWidth > 860) toggleMenu(false); });
+
+  // Count-up
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const t = +el.dataset.count, dec = +(el.dataset.dec || 0), pre = el.dataset.prefix || '', suf = el.dataset.suffix || '', start = performance.now();
+    (function tick(now){
+      const p = Math.min((now - start) / 1400, 1), v = t * (1 - Math.pow(1 - p, 3));
+      el.textContent = pre + v.toFixed(dec) + suf;
+      if (p < 1) requestAnimationFrame(tick);
+    })(start);
+  });
+
+  // Progress bars
+  setTimeout(() => document.querySelectorAll('.bar i').forEach(b => b.style.width = b.dataset.w + '%'), 200);
+
+  // Payment chart (Upcoming / Paid)
+  const data = { up: [5100, 5100, 3900], paid: [3200, 4600, 5400] };
+  const bars = document.querySelectorAll('#plot .b');
+  function setBars(key){
+    bars.forEach((b, i) => {
+      b.style.height = (data[key][i] / 6000 * 100) + '%';
+      b.dataset.v = '$' + data[key][i].toLocaleString();
+    });
+  }
+  setTimeout(() => setBars('up'), 400);
+  document.querySelectorAll('#toggle button').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('#toggle button').forEach(x => x.classList.remove('on'));
+    btn.classList.add('on');
+    setBars(btn.dataset.set);
+  }));
+</script>
+</body>
+</html>

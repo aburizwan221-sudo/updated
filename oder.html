@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Besa - Your Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --orange:#ff6a1f;
+  --orange-2:#ff8a3d;
+  --orange-soft:#fff1e8;
+  --bg:#fdf6f1;
+  --card:#fff;
+  --text:#1f2430;
+  --muted:#8a8f9c;
+  --border:#f0e6df;
+  --green:#1faa62;
+  --red:#e5484d;
+  --shadow:0 6px 24px rgba(255,106,31,.08);
+  --sidebar-w:240px;
+  --radius:18px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.4;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit}
+input{font-family:inherit;border:0;outline:0;background:none;color:inherit}
+ul{list-style:none}
+small{font-size:12px;color:var(--muted)}
+img{max-width:100%;display:block}
+img[src=""]{visibility:hidden}   /* khali img ka broken icon hide */
+
+.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ============ LAYOUT ============ */
+.layout{display:flex;min-height:100vh}
+.main{flex:1;margin-left:var(--sidebar-w);min-width:0;display:flex;flex-direction:column}
+.content{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;padding:22px 24px 30px}
+.left-col,.right-col{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+/* ============ SIDEBAR ============ */
+.sidebar{
+  position:fixed;inset:0 auto 0 0;width:var(--sidebar-w);
+  background:linear-gradient(180deg,#fff 0%,#fff8f3 100%);
+  border-right:1px solid var(--border);
+  padding:26px 24px;display:flex;flex-direction:column;gap:26px;
+  z-index:50;overflow-y:auto;transition:transform .35s ease;
+  animation:slideInLeft .7s ease both;
+}
+.logo{display:flex;align-items:center;gap:10px;font-size:32px;font-weight:700}
+.logo-img{width:46px;height:46px;border-radius:50%;background:var(--orange);animation:pulse 3s ease-in-out infinite}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav a{
+  display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:12px;
+  font-weight:500;font-size:15px;color:#3a3f4c;position:relative;
+  transition:all .25s ease;
+}
+.nav a:hover{background:var(--orange-soft);color:var(--orange);transform:translateX(4px)}
+.nav a.active{background:linear-gradient(90deg,var(--orange),var(--orange-2));color:#fff;box-shadow:0 8px 18px rgba(255,106,31,.35)}
+.nav .i{width:22px;height:22px}
+
+.promo{margin-top:auto;background:linear-gradient(160deg,#fff1e8,#fff);border-radius:var(--radius);padding:18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.promo-img{width:100%;height:100px;object-fit:contain;animation:float 4s ease-in-out infinite}
+.promo h4{font-size:19px;line-height:1.2;margin:8px 0 6px}
+.promo p{color:var(--muted);font-size:12px;margin-bottom:14px}
+
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;
+  padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;
+  transition:transform .25s,box-shadow .25s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 16px rgba(255,106,31,.4)}
+.btn-primary .i{width:14px;height:14px;transition:transform .25s}
+.btn-primary:hover .i{transform:translateX(4px)}
+
+/* ============ TOPBAR ============ */
+.topbar{
+  display:flex;align-items:center;gap:18px;padding:18px 24px;
+  position:sticky;top:0;z-index:40;background:rgba(253,246,241,.85);backdrop-filter:blur(10px);
+  animation:fadeDown .6s ease both;
+}
+.menu-btn{display:none;width:42px;height:42px;border-radius:12px;background:#fff;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.menu-btn .i{width:22px;height:22px}
+.search{flex:1;max-width:580px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:30px;padding:0 18px;height:46px;transition:box-shadow .25s,border-color .25s}
+.search:focus-within{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,106,31,.12)}
+.search .i{color:var(--muted)}
+.search input{flex:1;min-width:0;font-size:13px}
+.search input::placeholder{color:#a3a7b2}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.bell{position:relative;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;transition:background .25s}
+.bell:hover{background:#fff}
+.bell .i{width:22px;height:22px;transform-origin:top center;animation:ring 3s ease-in-out infinite}
+.badge{position:absolute;top:2px;right:2px;background:var(--orange);color:#fff;font-size:10px;font-weight:600;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;animation:pulse 2s infinite}
+.lang{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:30px;padding:0 16px;height:46px;font-weight:500;transition:box-shadow .25s}
+.lang:hover{box-shadow:var(--shadow)}
+.flag{width:24px;height:24px;border-radius:50%;background:#e8eaef;object-fit:cover}
+.profile{display:flex;align-items:center;gap:10px;cursor:pointer}
+.avatar{width:42px;height:42px;border-radius:50%;background:#e8dcd3;object-fit:cover;flex-shrink:0}
+.p-info{display:flex;flex-direction:column;line-height:1.2}
+.p-info strong{font-size:14px}
+
+/* ============ BANNER ============ */
+.banner{
+  position:relative;overflow:hidden;border-radius:var(--radius);border:1px solid var(--border);
+  background:linear-gradient(100deg,#fde5d5 0%,#fdeee3 50%,#fdeee3 100%);
+  padding:30px 34px;min-height:132px;display:flex;align-items:center;
+  animation:fadeUp .7s .1s ease both;
+}
+.banner::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.35);right:180px;top:-120px;animation:float 6s ease-in-out infinite}
+.banner-text{position:relative;z-index:2}
+.banner h1{font-size:34px;font-weight:600;margin-bottom:4px}
+.banner p{color:#5b606c;font-size:15px}
+.banner-art{position:absolute;right:270px;bottom:0;top:0;width:340px;pointer-events:none}
+.art{position:absolute;object-fit:contain;bottom:0}
+.art-1{width:150px;height:150px;right:0;animation:float 4s ease-in-out infinite}
+.art-2{width:100px;height:100px;left:60px;animation:float 5s ease-in-out infinite .5s}
+.art-3{width:60px;height:60px;top:10px;left:150px;animation:float 3.5s ease-in-out infinite .2s}
+.date-range{
+  position:absolute;right:24px;top:50%;transform:translateY(-50%);z-index:3;
+  display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:0 18px;height:52px;
+  font-weight:500;box-shadow:var(--shadow);transition:box-shadow .25s;
+}
+.date-range:hover{box-shadow:0 10px 26px rgba(255,106,31,.2)}
+.date-range .cal{color:var(--orange);width:20px;height:20px}
+.date-range .i{width:15px;height:15px}
+
+/* ============ STATS ============ */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.stat{
+  display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px 14px;
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+  animation:fadeUp .6s ease both;
+}
+.stat:nth-child(1){animation-delay:.15s}.stat:nth-child(2){animation-delay:.22s}.stat:nth-child(3){animation-delay:.29s}
+.stat:nth-child(4){animation-delay:.36s}.stat:nth-child(5){animation-delay:.43s}.stat:nth-child(6){animation-delay:.5s}
+.stat:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(255,106,31,.15);border-color:#ffd2b8}
+.stat.active{border:1.5px solid #ffc4a3;background:linear-gradient(180deg,#fff5ee,#fff)}
+.s-ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;flex-shrink:0;transition:transform .4s}
+.stat:hover .s-ico{transform:rotate(-8deg) scale(1.1)}
+.s-ico .i{width:22px;height:22px}
+.s-ico.orange{background:linear-gradient(135deg,#ff8a3d,#ff5a10)}
+.s-ico.yellow{background:linear-gradient(135deg,#ffd27a,#ffb02e)}
+.s-ico.blue{background:linear-gradient(135deg,#7aa2ff,#4a6cf7)}
+.s-ico.green{background:linear-gradient(135deg,#5fd4a0,#2bb673)}
+.s-ico.purple{background:linear-gradient(135deg,#a58bff,#7b5cf0)}
+.s-ico.red{background:linear-gradient(135deg,#ff8a8f,#ef4b52)}
+.s-body span{font-size:13px;color:#4a4f5c}
+.s-body h3{font-size:26px;font-weight:600;line-height:1.15}
+.s-body em{font-style:normal;font-size:12px;font-weight:600;display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.s-body em small{font-weight:400;margin-left:4px;font-size:10px}
+.s-body em .i{width:12px;height:12px}
+.up{color:var(--green)}.down{color:var(--red)}
+
+/* ============ CARDS ============ */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.02);animation:fadeUp .7s ease both}
+.right-col .card:nth-child(1){animation-delay:.2s}
+.right-col .card:nth-child(2){animation-delay:.32s}
+.right-col .card:nth-child(3){animation-delay:.44s}
+.table-card{animation-delay:.3s}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600}
+.orange-t{color:var(--orange)}
+.link{color:var(--orange);font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.link .i{width:12px;height:12px;transition:transform .25s}
+.link:hover .i{transform:translateX(4px)}
+
+/* ============ FILTERS + TABLE ============ */
+.filters{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.search.wide{max-width:none;border-radius:14px;background:#fdf9f6}
+.select{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fdf9f6;border:1px solid var(--border);border-radius:14px;padding:0 16px;height:46px;font-size:13px;font-weight:500;min-width:130px;transition:border-color .25s}
+.select:hover{border-color:var(--orange)}
+.select .i{width:14px;height:14px}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:820px}
+thead th{background:#fdf6f1;text-align:left;font-weight:500;font-size:13px;color:#5b606c;padding:14px 12px}
+thead th:first-child{border-radius:12px 0 0 12px;padding-left:16px}
+thead th:last-child{border-radius:0 12px 12px 0}
+tbody tr{border-bottom:1px solid #f6eee8;transition:background .25s;animation:fadeUp .5s ease both}
+tbody tr:nth-child(1){animation-delay:.45s}tbody tr:nth-child(2){animation-delay:.52s}tbody tr:nth-child(3){animation-delay:.59s}
+tbody tr:nth-child(4){animation-delay:.66s}tbody tr:nth-child(5){animation-delay:.73s}tbody tr:nth-child(6){animation-delay:.8s}
+tbody tr:nth-child(7){animation-delay:.87s}
+tbody tr:last-child{border-bottom:0}
+tbody tr:hover{background:#fffaf6}
+tbody td{padding:14px 12px;vertical-align:middle;font-size:13px}
+tbody td:first-child{padding-left:16px}
+td b{font-weight:600;font-size:13px;display:block}
+td small{display:block}
+.vd{color:var(--orange);font-size:11px;display:inline-flex;align-items:center;gap:3px;margin-top:2px}
+.vd .i{width:10px;height:10px;transition:transform .25s}
+.vd:hover .i{transform:translateX(3px)}
+.cust{display:flex;align-items:center;gap:12px}
+.pay{display:inline-block !important;background:#f4f4f6;border-radius:6px;padding:1px 8px;font-size:10px;margin-top:3px}
+.date{color:#666b78}
+.ta-c{text-align:center !important}
+
+.prods{display:flex;align-items:center;gap:6px}
+.thumb{width:40px;height:40px;border-radius:10px;background:#f4eee9;display:block;overflow:hidden;transition:transform .25s}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb:hover{transform:scale(1.12) rotate(-3deg)}
+.more{width:26px;height:26px;border-radius:50%;background:#f2f2f4;display:grid;place-items:center;font-size:10px;color:var(--muted)}
+
+.pill{display:inline-block;padding:6px 18px;border-radius:20px;font-size:12px;font-weight:500}
+.pill.delivered{background:#e3f6ec;color:#1a9b58}
+.pill.processing{background:#ffecd6;color:#f08a1c}
+.pill.shipped{background:#e2ecff;color:#3563e9}
+.pill.cancelled{background:#ffe3e3;color:#e5484d}
+.dots{width:34px;height:34px;border-radius:50%;background:#f6f1ed;display:inline-grid;place-items:center;transition:all .25s}
+.dots:hover{background:var(--orange);color:#fff;transform:rotate(90deg)}
+
+/* ============ QUICK ACTIONS ============ */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.qa{display:flex;align-items:center;gap:8px;padding:14px 12px;border-radius:12px;font-weight:500;font-size:12px;transition:transform .25s,box-shadow .25s}
+.qa:hover{transform:translateY(-4px);box-shadow:0 10px 20px rgba(0,0,0,.08)}
+.qa .i{width:20px;height:20px}
+.qa-orange{background:#fff0e6;color:var(--orange)}
+.qa-purple{background:#f1ebff;color:#7b5cf0}
+.qa-blue{background:#e8f1ff;color:#3b7bf0}
+.qa-green{background:#e4f7ee;color:#1fa463}
+
+/* ============ INSIGHTS ============ */
+.insight{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.big{font-size:34px;font-weight:600;display:flex;align-items:center;gap:10px;line-height:1.2}
+.big em{font-style:normal;font-size:13px;display:flex;align-items:center;gap:2px}
+.big em .i{width:14px;height:14px}
+.spark{width:160px;height:64px;overflow:visible}
+.spark .line{stroke-dasharray:400;stroke-dashoffset:400;animation:draw 2s .6s ease forwards}
+.spark .area{opacity:0;animation:fadeIn 1s 1.6s ease forwards}
+
+/* ============ TIMELINE ============ */
+.timeline{position:relative;padding-left:26px;display:flex;flex-direction:column;gap:18px}
+.timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:#eadfd7}
+.timeline li{position:relative;animation:fadeUp .5s ease both}
+.timeline li:nth-child(1){animation-delay:.7s}.timeline li:nth-child(2){animation-delay:.8s}
+.timeline li:nth-child(3){animation-delay:.9s}.timeline li:nth-child(4){animation-delay:1s}
+.timeline li::before{content:"";position:absolute;left:-26px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 20%,transparent)}
+.c-green{--c:#22b573}.c-orange{--c:#ff8a1f}.c-blue{--c:#4c86ff}.c-purple{--c:#7b4ce0}
+.timeline p{font-size:13px;color:#3a3f4c}
+
+/* ============ ANIMATIONS ============ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,106,31,.5)}50%{box-shadow:0 0 0 8px rgba(255,106,31,0)}}
+@keyframes ring{0%,88%,100%{transform:rotate(0)}90%{transform:rotate(14deg)}92%{transform:rotate(-12deg)}94%{transform:rotate(9deg)}96%{transform:rotate(-6deg)}98%{transform:rotate(3deg)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+
+/* ============ RESPONSIVE ============ */
+.overlay{display:none}
+
+@media (max-width:1400px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:1200px){
+  .content{grid-template-columns:1fr}
+  .right-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:start}
+  .banner-art{right:250px;width:260px}
+}
+@media (max-width:992px){
+  .main{margin-left:0}
+  .sidebar{transform:translateX(-100%);box-shadow:none;animation:none}
+  #nav-toggle:checked ~ .layout .sidebar{transform:none;box-shadow:12px 0 40px rgba(0,0,0,.15)}
+  #nav-toggle:checked ~ .overlay{display:block;position:fixed;inset:0;background:rgba(20,20,30,.4);z-index:45;animation:fadeIn .3s both}
+  .menu-btn{display:flex}
+  .banner-art{display:none}
+}
+@media (max-width:768px){
+  .topbar{padding:14px 16px;gap:10px}
+  .lang span,.p-info,.profile > .i{display:none}
+  .lang{padding:0 12px;height:42px}
+  .content{padding:16px}
+  .banner{flex-direction:column;align-items:flex-start;gap:16px;padding:22px}
+  .banner h1{font-size:26px}
+  .date-range{position:static;transform:none;height:46px;font-size:13px;padding:0 14px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .filters{flex-direction:column}
+  .filters .select{width:100%}
+  .right-col{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .search{padding:0 14px}
+  .stats{gap:10px}
+  .stat{padding:12px 10px;gap:8px}
+  .s-ico{width:38px;height:38px}
+  .s-body h3{font-size:22px}
+  .bell{width:38px;height:38px}
+  .date-range{gap:6px}
+  .big{font-size:28px}
+  .spark{width:120px}
+}
+
+</style>
+<body>
+
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+  <symbol id="i-dn" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+</svg>
+
+<input type="checkbox" id="nav-toggle" hidden>
+<label for="nav-toggle" class="overlay"></label>
+
+<div class="layout">
+
+
+  <aside class="sidebar">
+    <a href="admin.html" class="logo">
+      <img src="../images/48.png" alt="Besa logo" class="logo-img">
+      <span>Besa</span>
+    </a>
+
+    <nav class="nav">
+      <a href="admin.html"><svg class="i"><use href="#i-home"/></svg>Dashboard</a>
+      <a href="product.html"><svg class="i"><use href="#i-box"/></svg>Products</a>
+      <a href="oder.html" class="active"><svg class="i"><use href="#i-bag"/></svg>Orders</a>
+      <a href="#"><svg class="i"><use href="#i-user"/></svg>Customers</a>
+      <a href="#"><svg class="i"><use href="#i-grid"/></svg>Categories</a>
+      <a href="#"><svg class="i"><use href="#i-star"/></svg>Reviews</a>
+      <a href="#"><svg class="i"><use href="#i-tag"/></svg>Promotions</a>
+      <a href="#"><svg class="i"><use href="#i-gear"/></svg>Settings</a>
+    </nav>
+
+    <div class="promo">
+      <img src="../images/image-removebg-preview 3.png" alt="Delivery shopping illustration" class="promo-img">
+      <h4>Delivering Happiness</h4>
+      <p>Fast, safe and reliable delivery for your customers.</p>
+      <a href="#" class="btn-primary">Manage Shipping <svg class="i"><use href="#i-arrow"/></svg></a>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <label for="nav-toggle" class="menu-btn" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></label>
+
+      <div class="search">
+        <svg class="i"><use href="#i-search"/></svg>
+        <input type="text" placeholder="Search for orders, customers, or products...">
+      </div>
+
+      <div class="top-right">
+        <button class="bell" aria-label="Notifications">
+          <svg class="i"><use href="#i-bell"/></svg>
+          <span class="badge">3</span>
+        </button>
+
+        <button class="lang">
+          <img src="" alt="flag" class="flag">
+          <span>English</span>
+          <svg class="i"><use href="#i-down"/></svg>
+        </button>
+
+        <div class="profile">
+          <img src="" alt="Amit Sharma" class="avatar">
+          <div class="p-info">
+            <strong>Amit Sharma</strong>
+            <small>Admin</small>
+          </div>
+          <svg class="i"><use href="#i-down"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div class="left-col">
+
+        <!-- Banner -->
+        <section class="banner">
+          <div class="banner-text">
+            <h1>Your Orders</h1>
+            <p>Track, manage and keep your customers happy.</p>
+          </div>
+          <div class="banner-art">
+            <img src="" alt="" class="art art-1">
+            <img src="" alt="" class="art art-2">
+            <img src="" alt="" class="art art-3">
+          </div>
+          <button class="date-range">
+            <svg class="i cal"><use href="#i-cal"/></svg>
+            <span>01 Apr 2025</span>
+            <svg class="i"><use href="#i-arrow"/></svg>
+            <span>30 Apr 2025</span>
+            <svg class="i"><use href="#i-down"/></svg>
+          </button>
+        </section>
+
+        <!-- Stat cards -->
+        <section class="stats">
+          <article class="stat active">
+            <div class="s-ico orange"><svg class="i"><use href="#i-bag"/></svg></div>
+            <div class="s-body">
+              <span>All Orders</span>
+              <h3>400</h3>
+              <em class="up"><svg class="i"><use href="#i-up"/></svg>12% <small>vs last month</small></em>
+            </div>
+          </article>
+          <article class="stat">
+            <div class="s-ico yellow"><svg class="i"><use href="#i-clock"/></svg></div>
+            <div class="s-body">
+              <span>Pending</span>
+              <h3>52</h3>
+              <em class="up"><svg class="i"><use href="#i-up"/></svg>8% <small>vs last month</small></em>
+            </div>
+          </article>
+          <article class="stat">
+            <div class="s-ico blue"><svg class="i"><use href="#i-gear"/></svg></div>
+            <div class="s-body">
+              <span>Processing</span>
+              <h3>98</h3>
+              <em class="up"><svg class="i"><use href="#i-up"/></svg>15% <small>vs last month</small></em>
+            </div>
+          </article>
+          <article class="stat">
+            <div class="s-ico green"><svg class="i"><use href="#i-truck"/></svg></div>
+            <div class="s-body">
+              <span>Shipped</span>
+              <h3>210</h3>
+              <em class="up"><svg class="i"><use href="#i-up"/></svg>18% <small>vs last month</small></em>
+            </div>
+          </article>
+          <article class="stat">
+            <div class="s-ico purple"><svg class="i"><use href="#i-check"/></svg></div>
+            <div class="s-body">
+              <span>Delivered</span>
+              <h3>35</h3>
+              <em class="up"><svg class="i"><use href="#i-up"/></svg>10% <small>vs last month</small></em>
+            </div>
+          </article>
+          <article class="stat">
+            <div class="s-ico red"><svg class="i"><use href="#i-x"/></svg></div>
+            <div class="s-body">
+              <span>Cancelled</span>
+              <h3>5</h3>
+              <em class="down"><svg class="i"><use href="#i-dn"/></svg>2% <small>vs last month</small></em>
+            </div>
+          </article>
+        </section>
+
+        <!-- Orders table -->
+        <section class="card table-card">
+          <div class="filters">
+            <div class="search wide">
+              <svg class="i"><use href="#i-search"/></svg>
+              <input type="text" placeholder="Search by order ID, customer name or product...">
+            </div>
+            <button class="select">All Status <svg class="i"><use href="#i-down"/></svg></button>
+            <button class="select">Sort by: Newest <svg class="i"><use href="#i-down"/></svg></button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th><th>Customer</th><th>Products</th><th>Amount</th><th>Status</th><th>Date</th><th class="ta-c">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>#BSA12345</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Rohit Verma</b><small>rohit@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span><span class="thumb"><img src="" alt=""></span><span class="more">+1</span></div></td>
+                  <td><b>₹2,499</b><small class="pay">COD</small></td>
+                  <td><span class="pill delivered">Delivered</span></td>
+                  <td class="date">Apr 21, 2025<small>10:24 AM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><b>#BSA12344</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Priya Singh</b><small>priya@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span><span class="thumb"><img src="" alt=""></span><span class="more">+2</span></div></td>
+                  <td><b>₹1,860</b><small class="pay">Online</small></td>
+                  <td><span class="pill processing">Processing</span></td>
+                  <td class="date">Apr 21, 2025<small>09:15 AM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><b>#BSA12343</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Rahul Mehta</b><small>rahul@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span></div></td>
+                  <td><b>₹3,250</b><small class="pay">Online</small></td>
+                  <td><span class="pill shipped">Shipped</span></td>
+                  <td class="date">Apr 20, 2025<small>06:42 PM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><b>#BSA12342</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Neha Gupta</b><small>neha@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span><span class="thumb"><img src="" alt=""></span><span class="more">+1</span></div></td>
+                  <td><b>₹980</b><small class="pay">COD</small></td>
+                  <td><span class="pill delivered">Delivered</span></td>
+                  <td class="date">Apr 20, 2025<small>02:33 PM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><b>#BSA12341</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Sohan Lal</b><small>sohan@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span></div></td>
+                  <td><b>₹1,450</b><small class="pay">Online</small></td>
+                  <td><span class="pill cancelled">Cancelled</span></td>
+                  <td class="date">Apr 19, 2025<small>11:20 AM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><b>#BSA12340</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Ananya Sharma</b><small>ananya@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span><span class="thumb"><img src="" alt=""></span><span class="more">+1</span></div></td>
+                  <td><b>₹2,780</b><small class="pay">COD</small></td>
+                  <td><span class="pill processing">Processing</span></td>
+                  <td class="date">Apr 19, 2025<small>09:05 AM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+                <tr>
+                  <td><b>#BSA12339</b><a href="#" class="vd">View Details <svg class="i"><use href="#i-arrow"/></svg></a></td>
+                  <td><div class="cust"><img src="../images/38.png" alt="" class="avatar"><div><b>Karan Malhotra</b><small>karan@gmail.com</small></div></div></td>
+                  <td><div class="prods"><span class="thumb"><img src="" alt=""></span></div></td>
+                  <td><b>₹4,200</b><small class="pay">Online</small></td>
+                  <td><span class="pill shipped">Shipped</span></td>
+                  <td class="date">Apr 18, 2025<small>04:18 PM</small></td>
+                  <td class="ta-c"><button class="dots"><svg class="i"><use href="#i-dots"/></svg></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ RIGHT COLUMN ============ -->
+      <div class="right-col">
+
+        <section class="card">
+          <h3 class="card-title"><svg class="i orange-t"><use href="#i-bolt"/></svg>Quick Actions</h3>
+          <div class="qa-grid">
+            <a href="#" class="qa qa-orange"><svg class="i"><use href="#i-plus"/></svg>Add New Order</a>
+            <a href="#" class="qa qa-purple"><svg class="i"><use href="#i-box"/></svg>Manage Products</a>
+            <a href="#" class="qa qa-blue"><svg class="i"><use href="#i-users"/></svg>View Customers</a>
+            <a href="#" class="qa qa-green"><svg class="i"><use href="#i-chart"/></svg>Generate Report</a>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3 class="card-title"><svg class="i orange-t"><use href="#i-chart"/></svg>Order Insights</h3>
+            <a href="#" class="link">View Report <svg class="i"><use href="#i-arrow"/></svg></a>
+          </div>
+          <div class="insight">
+            <div>
+              <small>Total Orders</small>
+              <div class="big">400 <em class="up"><svg class="i"><use href="#i-up"/></svg>12%</em></div>
+            </div>
+            <svg class="spark" viewBox="0 0 160 60" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#ff6a1f" stop-opacity=".25"/>
+                  <stop offset="1" stop-color="#ff6a1f" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path class="area" d="M0 48 L20 44 L38 47 L56 36 L74 30 L92 34 L112 26 L132 24 L148 14 L160 8 L160 60 L0 60 Z" fill="url(#g)"/>
+              <polyline class="line" points="0,48 20,44 38,47 56,36 74,30 92,34 112,26 132,24 148,14 160,8" fill="none" stroke="#ff6a1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h3 class="card-title"><svg class="i orange-t"><use href="#i-clock"/></svg>Recent Activity</h3>
+            <a href="#" class="link">View All <svg class="i"><use href="#i-arrow"/></svg></a>
+          </div>
+          <ul class="timeline">
+            <li class="c-green"><p>Order #BSA12345 delivered</p><small>2 hours ago</small></li>
+            <li class="c-orange"><p>Order #BSA12344 is processing</p><small>3 hours ago</small></li>
+            <li class="c-blue"><p>New order #BSA12346 placed</p><small>5 hours ago</small></li>
+            <li class="c-purple"><p>Order #BSA12339 shipped</p><small>6 hours ago</small></li>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
